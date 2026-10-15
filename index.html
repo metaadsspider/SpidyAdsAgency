@@ -6,6 +6,36 @@
 <title>SPIDY ADS AGENCY — Meta Ads That Catch Customers Mid-Scroll</title>
 <meta name="description" content="Spidy Ads Agency builds Meta ad systems that stop thumbs, capture leads and scale brands past six figures.">
 <script>document.documentElement.classList.add('js')</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     META PIXEL CODE
+     ① PASTE YOUR PIXEL ID IN THE LINE BELOW (the "PIXEL_ID" variable)
+     ② ALSO REPLACE IT IN THE <noscript> IMAGE URL RIGHT AFTER THIS
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  var PIXEL_ID = "2640330356380954"; /* ← ① YOUR 15–16 DIGIT META PIXEL ID HERE */
+  if(!PIXEL_ID || PIXEL_ID === "2640330356380954"){
+    console.warn("[SPIDY] Meta Pixel inactive — paste your Pixel ID in <head> (search: 2640330356380954).");
+    return;
+  }
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', PIXEL_ID);
+  fbq('track', 'PageView');
+  window.__META_PIXEL_ACTIVE__ = true;
+})();
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1" alt=""/></noscript>
+<!-- ═════════════════════ END META PIXEL CODE ═════════════════════ -->
+
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -461,7 +491,7 @@ footer{border-top:1px solid var(--line)}
   <section class="sec" id="process">
     <div class="container">
       <div class="sec-head" data-reveal>
-        <span class="sec-tag mono" data-scramble>[ 04 — THE METHOD ]</span>
+        <span class="sec-tag mono" data-scramble="[ 04 — THE METHOD ]</span>
         <h2>FOUR MOVES.<br><span class="outline">ZERO GUESSWORK.</span></h2>
       </div>
       <div class="steps" id="steps">
@@ -845,6 +875,46 @@ Promise.race([fontsReady,new Promise(r=>setTimeout(r,1500))]).then(()=>{
   const eb=$('#eyebrow');
   if(eb&&!RM)scrambleTo(eb,eb.dataset.text);
 });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PIXEL EVENTS — fire automatically once your Pixel ID is set above
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  var ok = window.__META_PIXEL_ACTIVE__ === true && typeof window.fbq === 'function';
+  function px(){ if(ok) window.fbq.apply(window.fbq, arguments); }
+
+  /* 1 — CONTACT: fires the instant ANY Telegram CTA is clicked (before redirect) */
+  document.querySelectorAll('a[href*="tg-join-tracker"]').forEach(function(a){
+    a.addEventListener('click', function(){
+      px('track','Contact',{content_name:'Telegram_Join', content_type:'button'});
+    });
+  });
+
+  /* 2 — SCROLL DEPTH: 25 / 50 / 75 / 100% (each fires once per visit) */
+  var marks={};
+  window.addEventListener('scroll', function(){
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    if(max <= 0) return;
+    var p = Math.round(window.scrollY / max * 100);
+    [25,50,75,100].forEach(function(m){
+      if(p >= m && !marks[m]){ marks[m] = 1; px('trackCustom','ScrollDepth',{percent:m}); }
+    });
+  }, {passive:true});
+
+  /* 3 — VIEW CTA: final section 40% visible (great retargeting audience) */
+  var cta = document.querySelector('.cta');
+  if(cta && 'IntersectionObserver' in window){
+    var seen = false;
+    new IntersectionObserver(function(es){
+      if(es[0].isIntersecting && !seen){ seen = true; px('trackCustom','ViewCTA'); }
+    }, {threshold:.4}).observe(cta);
+  }
+
+  /* 4 — TIME ON PAGE: 30s engaged visitor */
+  setTimeout(function(){ px('trackCustom','TimeOnPage',{seconds:30}); }, 30000);
+})();
 </script>
 </body>
 </html>
